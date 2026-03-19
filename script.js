@@ -1,8 +1,8 @@
 // ================= FIREBASE CONFIG =================
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
+  apiKey: "AIzaSyBCCwXkgNeXMob8pCyLR7D-jUTb7KOAZG4",
+  authDomain: "biotech-f22e3.firebaseapp.com",
+  projectId: "biotech-f22e",
 };
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";

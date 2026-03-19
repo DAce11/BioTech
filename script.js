@@ -8,8 +8,7 @@ const firebaseConfig = {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { 
   getAuth, 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
   onAuthStateChanged,
   signOut
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -22,25 +21,25 @@ window.login = function(e){
     e.preventDefault();
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
-    signInWithEmailAndPassword(auth,email,password)
-        .then(()=>window.location.href="home.html")
-        .catch(err=>alert(err.message));
-}
 
-// ================= REGISTER =================
-window.register = function(e){
-    e.preventDefault();
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    createUserWithEmailAndPassword(auth,email,password)
-        .then(()=>window.location.href="login.html")
-        .catch(err=>alert(err.message));
+    // Optional: check password strength before login
+    const strongPassRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{12,}$/;
+    if(!strongPassRegex.test(password)){
+        alert("Weak password format. Please use the provided account credentials.");
+        return;
+    }
+
+    signInWithEmailAndPassword(auth,email,password)
+        .then(()=>window.location.href="home.html") // redirect after login
+        .catch(err=>{
+            alert("Login failed: " + err.message);
+        });
 }
 
 // ================= CHECK LOGIN =================
 window.checkAuth = function(){
     onAuthStateChanged(auth,user=>{
-        if(!user) window.location.href="index.html";
+        if(!user) window.location.href="login.html"; // redirect if not logged in
     });
 }
 

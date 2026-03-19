@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bionic Arm Web Controller</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<img src="f.jpg" alt="Farmers Field" class="bg-image">
+
+<div class="app">
+
+    <div class="header">
+        <h1>🌾 BIONIC ARM CONTROL</h1>
+        <div class="status">Status: <span id="status">Disconnected</span></div>
+    </div>
+
+    <div class="nav">
+        <button onclick="window.location.href='manual.html'">Manual</button>
+        <button onclick="window.location.href='dashboard.html'">Dashboard</button>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <button class="connect-btn" onclick="connect()">Connect Arduino</button>
+
+    <div class="control-section">
+        <div class="angle-display" id="angleValueDisplay">0°</div>
+
+        <div class="slider-row">
+            <button onclick="decrease()">-</button>
+            <input type="range" min="0" max="180" value="0" id="servoSlider">
+            <button onclick="increase()">+</button>
+        </div>
+
+        <button class="connect-btn" style="margin-top:15px;" onclick="sendAngle()">
+            SET SERVO
+        </button>
+    </div>
+
+    <div class="footer">Neuro-Motion Interface v1.0</div>
+
+</div>
+
+<script type="module" src="script.js"></script>
+<script>
+checkAuth();
+
+// ================= ARDUINO CONTROL =================
+let port, writer;
+const NODEMCU_IP = "10.118.181.151";
+
+async function connect(){
+    try{
+        port = await navigator.serial.requestPort();
+        await port.open({baudRate:9600});
+        const encoder = new TextEncoderStream();
+        encoder.readable.pipeTo(port.writable);
+        writer = encoder.writable.getWriter();
+        document.getElementById("status").textContent="Connected";
+        document.getElementById("status").style.color="#2e7d32";
+    } catch(err){
+        alert("Connection failed.");
+    }
+}
+
+const slider = document.getElementById("servoSlider");
+const angleDisplay = document.getElementById("angleValueDisplay");
+
+slider.addEventListener("input", ()=>{ angleDisplay.textContent = slider.value + "°"; });
+
+function increase(){
+    if(parseInt(slider.value) < 180){
+        slider.value = parseInt(slider.value)+1;
+        angleDisplay.textContent = slider.value + "°";
+    }
+}
+
+function decrease(){
+    if(parseInt(slider.value) > 0){
+        slider.value = parseInt(slider.value)-1;
+        angleDisplay.textContent = slider.value + "°";
+    }
+}
+
+function sendAngle(){
+    let angle = slider.value;
+    fetch(`http://${NODEMCU_IP}/servo?angle=${angle}`);
+}
+</script>
+</body>
+</html>

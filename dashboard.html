@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bionic Arm Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<script type="module" src="script.js"></script>
+<script>checkAuth();</script>
+
+<div class="container">
+    <div class="nav">
+        <a href="index.html">Controller</a>
+        <a href="manual.html">Manual</a>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <h1><span class="icon">🌾</span> SMART AGRI DASHBOARD</h1>
+
+    <div class="grid">
+        <div class="card">
+            <h2>🧑‍🌾 Rice Season Calendar</h2>
+            <table>
+                <tr><th>Month</th><th>Status</th></tr>
+                <tr><td>January</td><td>Preparation</td></tr>
+                <tr><td>February</td><td class="highlight-plant">Planting</td></tr>
+                <tr><td>March</td><td class="highlight-plant">Growing</td></tr>
+                <tr><td>April</td><td>Growing</td></tr>
+                <tr><td>May</td><td class="highlight-harvest">Harvest</td></tr>
+                <tr><td>June</td><td>Rest Period</td></tr>
+                <tr><td>July</td><td class="highlight-plant">Planting</td></tr>
+                <tr><td>August</td><td>Growing</td></tr>
+                <tr><td>September</td><td>Growing</td></tr>
+                <tr><td>October</td><td class="highlight-harvest">Harvest</td></tr>
+                <tr><td>November</td><td>Monitoring</td></tr>
+                <tr><td>December</td><td>Preparation</td></tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>📢 Developer Updates</h2>
+            <div id="updatesList"></div>
+        </div>
+
+        <div class="card">
+            <h2>🎉 Daily Farming Motivation</h2>
+            <div id="funBox">🌾 Click below to get today’s farming tech motivation!</div>
+            <button onclick="generateTip()">🌱 Generate Tip</button>
+        </div>
+    </div>
+</div>
+
+<div id="safetyReminder">
+⚠ Reminder for Farmers: Stay hydrated while working and avoid overexertion.
+</div>
+
+<script>
+const updates = [
+"✔ Version 1.0 - Web Servo Control Released",
+"✔ Manual & Visual Guide Added",
+"🔄 Next Update: Multi-Finger Control System",
+"🚀 Upcoming: Wireless Control (WiFi Module)"
+];
+
+function renderUpdates(){
+    const updatesDiv=document.getElementById('updatesList');
+    updatesDiv.innerHTML='';
+    updates.forEach(update=>{
+        const div=document.createElement('div');
+        div.className='update';
+        div.innerText=update;
+        updatesDiv.appendChild(div);
+    });
+}
+renderUpdates();
+
+function generateTip(){
+    const tips=[
+        "🌾 Innovation grows where courage is planted",
+        "🌱 Every harvest begins with smart preparation.",
+        "🚜 Technology + Agriculture = Future Farming",
+        "🌿 Build systems that work while you rest.",
+        "⚡ Precision farming increases productivity."
+    ];
+    const randomTip=tips[Math.floor(Math.random()*tips.length)];
+    document.getElementById("funBox").innerText=randomTip;
+}
+</script>
+
+</body>
+</html>

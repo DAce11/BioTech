@@ -43,51 +43,54 @@
 
 </div>
 
+<!-- Import Firebase script -->
 <script type="module" src="script.js"></script>
+
 <script>
-checkAuth();
+  // Check if user is logged in
+  checkAuth();
 
-// ================= ARDUINO CONTROL =================
-let port, writer;
-const NODEMCU_IP = "10.118.181.151";
+  // ================= ARDUINO CONTROL =================
+  let port, writer;
+  const NODEMCU_IP = "10.118.181.151";
 
-async function connect(){
-    try{
-        port = await navigator.serial.requestPort();
-        await port.open({baudRate:9600});
-        const encoder = new TextEncoderStream();
-        encoder.readable.pipeTo(port.writable);
-        writer = encoder.writable.getWriter();
-        document.getElementById("status").textContent="Connected";
-        document.getElementById("status").style.color="#2e7d32";
-    } catch(err){
-        alert("Connection failed.");
-    }
-}
+  async function connect(){
+      try{
+          port = await navigator.serial.requestPort();
+          await port.open({baudRate:9600});
+          const encoder = new TextEncoderStream();
+          encoder.readable.pipeTo(port.writable);
+          writer = encoder.writable.getWriter();
+          document.getElementById("status").textContent="Connected";
+          document.getElementById("status").style.color="#2e7d32";
+      } catch(err){
+          alert("Connection failed.");
+      }
+  }
 
-const slider = document.getElementById("servoSlider");
-const angleDisplay = document.getElementById("angleValueDisplay");
+  const slider = document.getElementById("servoSlider");
+  const angleDisplay = document.getElementById("angleValueDisplay");
 
-slider.addEventListener("input", ()=>{ angleDisplay.textContent = slider.value + "°"; });
+  slider.addEventListener("input", ()=>{ angleDisplay.textContent = slider.value + "°"; });
 
-function increase(){
-    if(parseInt(slider.value) < 180){
-        slider.value = parseInt(slider.value)+1;
-        angleDisplay.textContent = slider.value + "°";
-    }
-}
+  function increase(){
+      if(parseInt(slider.value) < 180){
+          slider.value = parseInt(slider.value)+1;
+          angleDisplay.textContent = slider.value + "°";
+      }
+  }
 
-function decrease(){
-    if(parseInt(slider.value) > 0){
-        slider.value = parseInt(slider.value)-1;
-        angleDisplay.textContent = slider.value + "°";
-    }
-}
+  function decrease(){
+      if(parseInt(slider.value) > 0){
+          slider.value = parseInt(slider.value)-1;
+          angleDisplay.textContent = slider.value + "°";
+      }
+  }
 
-function sendAngle(){
-    let angle = slider.value;
-    fetch(`http://${NODEMCU_IP}/servo?angle=${angle}`);
-}
+  function sendAngle(){
+      let angle = slider.value;
+      fetch(`http://${NODEMCU_IP}/servo?angle=${angle}`);
+  }
 </script>
 </body>
 </html>

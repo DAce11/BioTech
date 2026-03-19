@@ -23,7 +23,7 @@ window.login = function(e){
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
     signInWithEmailAndPassword(auth,email,password)
-        .then(()=>window.location.href="index.html")
+        .then(()=>window.location.href="home.html")
         .catch(err=>alert(err.message));
 }
 
@@ -40,7 +40,7 @@ window.register = function(e){
 // ================= CHECK LOGIN =================
 window.checkAuth = function(){
     onAuthStateChanged(auth,user=>{
-        if(!user) window.location.href="login.html";
+        if(!user) window.location.href="index.html";
     });
 }
 

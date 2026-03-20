@@ -46,32 +46,20 @@
 <!-- Import Firebase script -->
 <script type="module" src="script.js"></script>
 
-<script>
-  // Check if user is logged in
-  checkAuth();
 
   // ================= ARDUINO CONTROL =================
-  let port, writer;
-  const NODEMCU_IP = "192.168.4.1";
+ <script>
+  checkAuth();
 
-  async function connect(){
-      try{
-          port = await navigator.serial.requestPort();
-          await port.open({baudRate:9600});
-          const encoder = new TextEncoderStream();
-          encoder.readable.pipeTo(port.writable);
-          writer = encoder.writable.getWriter();
-          document.getElementById("status").textContent="Connected";
-          document.getElementById("status").style.color="#2e7d32";
-      } catch(err){
-          alert("Connection failed.");
-      }
-  }
+  const NODEMCU_IP = "192.168.4.1"; // Change if needed
 
   const slider = document.getElementById("servoSlider");
   const angleDisplay = document.getElementById("angleValueDisplay");
 
-  slider.addEventListener("input", ()=>{ angleDisplay.textContent = slider.value + "°"; });
+  // Display angle
+  slider.addEventListener("input", () => {
+      angleDisplay.textContent = slider.value + "°";
+  });
 
   function increase(){
       if(parseInt(slider.value) < 180){
@@ -87,9 +75,20 @@
       }
   }
 
+  // Send angle to NodeMCU
   function sendAngle(){
       let angle = slider.value;
-      fetch(`http://${NODEMCU_IP}/servo?angle=${angle}`);
+
+      fetch(`http://${NODEMCU_IP}/servo?angle=${angle}`)
+      .then(res => res.text())
+      .then(data => {
+          document.getElementById("status").textContent = "Connected";
+          document.getElementById("status").style.color = "green";
+      })
+      .catch(err => {
+          document.getElementById("status").textContent = "Disconnected";
+          document.getElementById("status").style.color = "red";
+      });
   }
 </script>
 </body>

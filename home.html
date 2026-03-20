@@ -47,48 +47,57 @@
 <script type="module" src="script.js"></script>
 
 
-  // ================= ARDUINO CONTROL =================
- <script>
+  <script>
+  // Check if user is logged in
   checkAuth();
 
-  const NODEMCU_IP = "192.168.4.1"; // Change if needed
+  // ================= ARDUINO CONTROL =================
+  let port, writer;
+  const NODEMCU_IP = "192.168.4.1";
+
+  async function connect() {
+      try {
+          port = await navigator.serial.requestPort();
+          await port.open({ baudRate: 9600 });
+
+          const encoder = new TextEncoderStream();
+          encoder.readable.pipeTo(port.writable);
+          writer = encoder.writable.getWriter();
+
+          document.getElementById("status").textContent = "Connected";
+          document.getElementById("status").style.color = "#2e7d32";
+
+      } catch (err) {
+          alert("Connection failed.");
+      }
+  }
 
   const slider = document.getElementById("servoSlider");
   const angleDisplay = document.getElementById("angleValueDisplay");
 
-  // Display angle
+  // Update angle display
   slider.addEventListener("input", () => {
       angleDisplay.textContent = slider.value + "°";
   });
 
-  function increase(){
-      if(parseInt(slider.value) < 180){
-          slider.value = parseInt(slider.value)+1;
+  function increase() {
+      if (parseInt(slider.value) < 180) {
+          slider.value = parseInt(slider.value) + 1;
           angleDisplay.textContent = slider.value + "°";
       }
   }
 
-  function decrease(){
-      if(parseInt(slider.value) > 0){
-          slider.value = parseInt(slider.value)-1;
+  function decrease() {
+      if (parseInt(slider.value) > 0) {
+          slider.value = parseInt(slider.value) - 1;
           angleDisplay.textContent = slider.value + "°";
       }
   }
 
-  // Send angle to NodeMCU
-  function sendAngle(){
+  function sendAngle() {
       let angle = slider.value;
 
-      fetch(`http://${NODEMCU_IP}/servo?angle=${angle}`)
-      .then(res => res.text())
-      .then(data => {
-          document.getElementById("status").textContent = "Connected";
-          document.getElementById("status").style.color = "green";
-      })
-      .catch(err => {
-          document.getElementById("status").textContent = "Disconnected";
-          document.getElementById("status").style.color = "red";
-      });
+      fetch(`http://${NODEMCU_IP}/servo?angle=${angle}`);
   }
 </script>
 </body>

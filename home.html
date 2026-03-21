@@ -5,16 +5,27 @@
 <title>Bionic Arm Web Controller</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="style.css">
+<style>
+body { font-family: Arial, sans-serif; background-color: #f0f0f0; }
+.app { max-width: 500px; margin: 20px auto; background: #fff; padding: 20px; border-radius: 10px; }
+.header { text-align: center; margin-bottom: 20px; }
+.nav button { margin: 5px; padding: 10px; }
+.control-section { text-align: center; margin-top: 20px; }
+.slider-row { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 10px; }
+.slider-row input[type=range] { width: 200px; }
+.connect-btn { padding: 10px 20px; margin-top: 10px; cursor: pointer; }
+.footer { text-align: center; margin-top: 20px; font-size: 0.9em; color: #555; }
+.angle-display { font-size: 2em; margin-bottom: 10px; }
+.status span { font-weight: bold; }
+</style>
 </head>
 <body>
-
-<img src="f.jpg" alt="Farmers Field" class="bg-image">
 
 <div class="app">
 
     <div class="header">
         <h1>🌾 BIONIC ARM CONTROL</h1>
-        <div class="status">Status: <span id="status">Disconnected</span></div>
+        <div class="status">Status: <span id="status">Connecting...</span></div>
     </div>
 
     <div class="nav">
@@ -22,8 +33,6 @@
         <button onclick="window.location.href='dashboard.html'">Dashboard</button>
         <button onclick="logout()">Logout</button>
     </div>
-
-    <button class="connect-btn" onclick="connect()">Connect Arduino</button>
 
     <div class="control-section">
         <div class="angle-display" id="angleValueDisplay">0°</div>
@@ -33,70 +42,70 @@
             <input type="range" min="0" max="180" value="0" id="servoSlider">
             <button onclick="increase()">+</button>
         </div>
-
-        <button class="connect-btn" style="margin-top:15px;" onclick="sendAngle()">
-            SET SERVO
-        </button>
     </div>
 
     <div class="footer">Neuro-Motion Interface v1.0</div>
 
 </div>
 
-<!-- Import Firebase script -->
 <script type="module" src="script.js"></script>
 
+<script>
+const NODEMCU_IP = "192.168.1.45"; // <-- Replace with your NodeMCU IP
+const statusEl = document.getElementById("status");
+const slider = document.getElementById("servoSlider");
+const angleDisplay = document.getElementById("angleValueDisplay");
 
-  <script>
-  // Check if user is logged in
-  checkAuth();
+// Optional: check auth
+if (typeof checkAuth === "function") checkAuth();
 
-  // ================= ARDUINO CONTROL =================
-  let port, writer;
-  const NODEMCU_IP = "10.193.184.151";
+// Update angle display and send servo command in real-time
+slider.addEventListener("input", () => {
+    angleDisplay.textContent = slider.value + "°";
+    sendAngleRealTime(slider.value);
+});
 
-  async function connect() {
-      try {
-          port = await navigator.serial.requestPort();
-          await port.open({ baudRate: 115200 });
-
-          const encoder = new TextEncoderStream();
-          encoder.readable.pipeTo(port.writable);
-          writer = encoder.writable.getWriter();
-
-          document.getElementById("status").textContent = "Connected";
-          document.getElementById("status").style.color = "#2e7d32";
-
-      } catch (err) {
-          alert("Connection failed.");
-      }
-  }
-
-  const slider = document.getElementById("servoSlider");
-  const angleDisplay = document.getElementById("angleValueDisplay");
-
-  // Update angle display
-  slider.addEventListener("input", () => {
-      angleDisplay.textContent = slider.value + "°";
-  });
-
-  function increase() {
-      if (parseInt(slider.value) < 180) {
-          slider.value = parseInt(slider.value) + 1;
-          angleDisplay.textContent = slider.value + "°";
-      }
-  }
-
-  function decrease() {
-      if (parseInt(slider.value) > 0) {
-          slider.value = parseInt(slider.value) - 1;
-          angleDisplay.textContent = slider.value + "°";
-      }
-  }
-
-  function sendAngle() {
-    fetch(`http://192.168.1.45/servo?angle=${slider.value}`);
+function increase() {
+    if (+slider.value < 180) slider.value++;
+    angleDisplay.textContent = slider.value + "°";
+    sendAngleRealTime(slider.value);
 }
+
+function decrease() {
+    if (+slider.value > 0) slider.value--;
+    angleDisplay.textContent = slider.value + "°";
+    sendAngleRealTime(slider.value);
+}
+
+// Send angle to NodeMCU
+function sendAngleRealTime(angle) {
+    fetch(`http://${NODEMCU_IP}/servo?angle=${angle}`)
+        .then(res => {
+            statusEl.textContent = "Connected";
+            statusEl.style.color = "#2e7d32";
+        })
+        .catch(err => {
+            console.error(err);
+            statusEl.textContent = "Connection Failed";
+            statusEl.style.color = "#d32f2f";
+        });
+}
+
+// Automatic ping every 2 seconds to check NodeMCU connection
+function pingNodeMCU() {
+    fetch(`http://${NODEMCU_IP}/servo?angle=0`)
+        .then(res => {
+            statusEl.textContent = "Connected";
+            statusEl.style.color = "#2e7d32";
+        })
+        .catch(err => {
+            statusEl.textContent = "Connection Failed";
+            statusEl.style.color = "#d32f2f";
+        });
+}
+
+setInterval(pingNodeMCU, 2000);
 </script>
+
 </body>
 </html>

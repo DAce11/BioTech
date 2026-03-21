@@ -95,10 +95,8 @@
   }
 
   function sendAngle() {
-      let angle = slider.value;
-
-      fetch(`http://${NODEMCU_IP}/servo?angle=${angle}`);
-  }
+    fetch(`http://192.168.1.45/servo?angle=${slider.value}`);
+}
 </script>
 </body>
 </html>
